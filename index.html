@@ -457,7 +457,7 @@
             
             .item-row {
                 grid-template-columns: 1fr;
-                gap: 10px;
+                gap: 12px;
             }
             
             .motiv-selection {
@@ -673,6 +673,8 @@
                 addressSection.classList.remove('hidden');
                 addressField.setAttribute('required', 'required');
             }
+            // Preis neu berechnen wegen Versandkosten
+            updateTotalPrice();
         });
         
         // Größen-Dropdown und Motiv-Anzeige aktualisieren basierend auf Produkttyp
@@ -755,6 +757,7 @@
         // Gesamtpreis berechnen
         function updateTotalPrice() {
             let total = 0;
+            let totalQuantity = 0;
             const overviewItems = [];
             
             document.querySelectorAll('.order-item').forEach(item => {
@@ -762,6 +765,8 @@
                 const size = item.querySelector('.product-size').value;
                 const quantity = parseInt(item.querySelector('.product-quantity').value) || 0;
                 const motiv = item.querySelector('.selected-motiv').value;
+                
+                totalQuantity += quantity;
                 
                 if (productType && PRICES[productType]) {
                     const itemTotal = PRICES[productType] * quantity;
@@ -789,14 +794,27 @@
                 overviewItems.push(`Versand = ${VERSANDKOSTEN}€`);
             }
             
+            // Warnung bei über 10 Artikeln
+            const orderOverviewDiv = document.getElementById('orderOverview');
+            if (totalQuantity > 10) {
+                orderOverviewDiv.style.borderColor = '#dc3545';
+                orderOverviewDiv.style.backgroundColor = '#ffe6e6';
+            } else {
+                orderOverviewDiv.style.borderColor = '#5a7a8a';
+                orderOverviewDiv.style.backgroundColor = '#e8e8e0';
+            }
+            
             // Übersicht anzeigen/verstecken
-            const overviewDiv = document.getElementById('orderOverview');
             const overviewText = document.getElementById('overviewText');
             if (overviewItems.length > 0) {
-                overviewText.innerHTML = overviewItems.join('<br>');
-                overviewDiv.classList.remove('hidden');
+                let overviewHTML = overviewItems.join('<br>');
+                if (totalQuantity > 10) {
+                    overviewHTML = `<span style="color: #dc3545; font-weight: 700;">⚠️ Maximal 10 Artikel erlaubt! (Aktuell: ${totalQuantity})</span><br><br>` + overviewHTML;
+                }
+                overviewText.innerHTML = overviewHTML;
+                orderOverviewDiv.classList.remove('hidden');
             } else {
-                overviewDiv.classList.add('hidden');
+                orderOverviewDiv.classList.add('hidden');
             }
             
             // Gesamtpreis anzeigen
@@ -816,6 +834,13 @@
         // Bei Mengenänderung auch Preis aktualisieren
         document.getElementById('orderItems').addEventListener('input', function(e) {
             if (e.target.classList.contains('product-quantity')) {
+                updateTotalPrice();
+            }
+        });
+        
+        // Bei Größenänderung auch Preis aktualisieren
+        document.getElementById('orderItems').addEventListener('change', function(e) {
+            if (e.target.classList.contains('product-size')) {
                 updateTotalPrice();
             }
         });
@@ -909,6 +934,20 @@
             const submitBtn = document.getElementById('submitBtn');
             const successMsg = document.getElementById('successMessage');
             const errorMsg = document.getElementById('errorMessage');
+            
+            // Check Gesamtmenge
+            let totalQuantity = 0;
+            document.querySelectorAll('.order-item').forEach(item => {
+                const quantity = parseInt(item.querySelector('.product-quantity').value) || 0;
+                totalQuantity += quantity;
+            });
+            
+            if (totalQuantity > 10) {
+                errorMsg.textContent = '❌ Maximal 10 Artikel pro Bestellung erlaubt! Du hast ' + totalQuantity + ' Artikel.';
+                errorMsg.classList.remove('hidden');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+                return;
+            }
             
             // Validate: Check if clothing items have motiv selected
             let hasError = false;
