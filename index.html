@@ -431,6 +431,73 @@
             border-radius: 8px;
             border: 2px solid #e0e0e0;
         }
+        
+        /* Mobile Optimierung */
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            
+            .container {
+                padding: 20px;
+            }
+            
+            h1 {
+                font-size: 1.5em;
+            }
+            
+            .subtitle {
+                font-size: 1em;
+            }
+            
+            .product-banner {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+            
+            .item-row {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+            
+            .motiv-selection {
+                grid-template-columns: 1fr;
+            }
+            
+            .btn {
+                padding: 12px 20px;
+                font-size: 16px;
+            }
+            
+            .total-price-amount {
+                font-size: 1.5em;
+            }
+            
+            .order-item-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+            
+            .btn-remove {
+                width: 100%;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .container {
+                padding: 15px;
+            }
+            
+            h1 {
+                font-size: 1.3em;
+            }
+            
+            .price-list {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -586,6 +653,8 @@
             socken: 10
         };
         
+        const VERSANDKOSTEN = 5;
+        
         // Größen für verschiedene Produkte
         const SIZES = {
             clothing: ['S', 'M', 'L', 'XL', 'XXL'],
@@ -713,6 +782,13 @@
                 }
             });
             
+            // Versandkosten hinzufügen wenn nicht Abholung
+            const isAbholung = document.getElementById('abholung').checked;
+            if (!isAbholung && total > 0) {
+                total += VERSANDKOSTEN;
+                overviewItems.push(`Versand = ${VERSANDKOSTEN}€`);
+            }
+            
             // Übersicht anzeigen/verstecken
             const overviewDiv = document.getElementById('orderOverview');
             const overviewText = document.getElementById('overviewText');
@@ -765,6 +841,13 @@
         
         // Position hinzufügen
         document.getElementById('addItem').addEventListener('click', function() {
+            // Check ob schon 10 Artikel vorhanden sind
+            const currentItems = document.querySelectorAll('.order-item').length;
+            if (currentItems >= 10) {
+                alert('⚠️ Maximal 10 Artikel pro Bestellung möglich!\n\nFür größere Bestellungen kontaktiere uns bitte direkt.');
+                return;
+            }
+            
             itemCounter++;
             const orderItems = document.getElementById('orderItems');
             const newItem = document.createElement('div');
@@ -900,6 +983,11 @@
                     totalAmount += PRICES[item.type] * item.quantity;
                 });
                 
+                // Versandkosten hinzufügen
+                if (!abholung) {
+                    totalAmount += VERSANDKOSTEN;
+                }
+                
                 // Bestellübersicht erstellen
                 let orderSummaryHTML = '';
                 items.forEach((item, index) => {
@@ -922,6 +1010,17 @@
                         </div>
                     `;
                 });
+                
+                // Versandkosten in Bestellübersicht
+                if (!abholung) {
+                    orderSummaryHTML += `
+                        <div class="order-summary-item">
+                            <strong>Versand</strong>
+                            <div class="order-summary-row"><span>Preis:</span><span>${VERSANDKOSTEN}€</span></div>
+                        </div>
+                    `;
+                }
+                
                 orderSummaryHTML += `<div class="order-summary-total">Gesamtbetrag: ${totalAmount.toFixed(2).replace('.', ',')} €</div>`;
                 
                 document.getElementById('orderSummary').innerHTML = orderSummaryHTML;
