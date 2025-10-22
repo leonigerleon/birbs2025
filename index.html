@@ -1,0 +1,954 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bestellformular - Hoodies & Socken</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Nunito', sans-serif;
+            background: linear-gradient(135deg, #283845 0%, #202c39 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: #f5f5f0;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        
+        h1 {
+            color: #202c39;
+            margin-bottom: 10px;
+            font-size: 2em;
+        }
+        
+        .subtitle {
+            color: #202c39;
+            margin-bottom: 30px;
+            font-size: 1.1em;
+        }
+        
+        .price-info {
+            background: #fff4e6;
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            border-left: 4px solid #f5a962;
+        }
+        
+        .price-info h3 {
+            color: #c97a3d;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+        
+        .price-list {
+            display: flex;
+            gap: 30px;
+            color: #333;
+        }
+        
+        .price-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #202c39;
+            font-weight: 600;
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #5a7a8a;
+        }
+        
+        .motiv-selection {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 10px;
+        }
+        
+        .motiv-option {
+            border: 3px solid #e0e0e0;
+            border-radius: 12px;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+        }
+        
+        .motiv-option:hover {
+            border-color: #5a7a8a;
+            transform: translateY(-3px);
+        }
+        
+        .motiv-option.selected {
+            border-color: #5a7a8a;
+            background: #e8e8e0;
+        }
+        
+        .motiv-preview {
+            width: 100%;
+            aspect-ratio: 1 / 1;
+            background: #f5f5f5;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            margin-bottom: 8px;
+            font-size: 3em;
+        }
+        
+        .motiv-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+        
+        .order-items {
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 25px;
+        }
+        
+        .order-item {
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            position: relative;
+        }
+        
+        .item-price {
+            display: none;
+        }
+        
+        .order-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .item-row {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .motiv-section {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 2px dashed #e0e0e0;
+        }
+        
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .checkbox-group input[type="checkbox"] {
+            width: auto;
+        }
+        
+        .address-section {
+            background: #e8e8e0;
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid #5a7a8a;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .btn {
+            background: #7a9b6d;
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            transition: transform 0.2s;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            background: #6a8b5d;
+        }
+        
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .btn-secondary {
+            background: #9bb88f;
+            margin-top: 10px;
+        }
+        
+        .btn-secondary:hover {
+            background: #8ba87f;
+        }
+        
+        .total-price {
+            background: #e8e8e0;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: right;
+            border: 2px solid #5a7a8a;
+        }
+        
+        .total-price-label {
+            font-size: 1.2em;
+            color: #202c39;
+            margin-bottom: 5px;
+        }
+        
+        .total-price-amount {
+            font-size: 2em;
+            font-weight: 700;
+            color: #5a7a8a;
+        }
+        
+        .btn-remove {
+            background: #888;
+            padding: 8px 15px;
+            font-size: 14px;
+            width: auto;
+        }
+        
+        .btn-remove:hover {
+            background: #666;
+        }
+        
+        .success-message {
+            background: #e8e8e0;
+            color: #202c39;
+            padding: 30px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            border-left: 4px solid #7a9b6d;
+            text-align: center;
+            font-size: 1.2em;
+        }
+        
+        .success-message h2 {
+            margin-bottom: 15px;
+            color: #202c39;
+        }
+        
+        .success-message p {
+            margin: 10px 0;
+            line-height: 1.6;
+        }
+        
+        .payment-info {
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            margin: 25px 0;
+            border: 2px solid #5a7a8a;
+        }
+        
+        .payment-info h3 {
+            color: #202c39;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+        
+        .payment-details {
+            text-align: left;
+            line-height: 1.8;
+        }
+        
+        .payment-amount {
+            font-size: 1.8em;
+            font-weight: 700;
+            color: #5a7a8a;
+            margin: 15px 0;
+        }
+        
+        .paypal-address {
+            background: #f8f9fa;
+            padding: 12px;
+            border-radius: 6px;
+            font-family: monospace;
+            font-size: 1.1em;
+            color: #202c39;
+            margin: 10px 0;
+            word-break: break-all;
+        }
+        
+        .reload-hint {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 2px solid #7a9b6d;
+            font-size: 0.9em;
+            color: #202c39;
+        }
+        
+        .error-message {
+            background: #d4a574;
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #202c39;
+        }
+        
+        .motiv-label {
+            font-size: 0.9em;
+            color: #666;
+            margin-bottom: 10px;
+        }
+        
+        .size-chart {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 2px dashed #e0e0e0;
+        }
+        
+        .size-chart img {
+            width: 100%;
+            height: auto;
+            border-radius: 8px;
+            border: 2px solid #e0e0e0;
+        }
+        
+        .order-summary {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+        
+        .order-summary-item {
+            padding: 12px;
+            margin-bottom: 10px;
+            background: white;
+            border-radius: 6px;
+            border-left: 4px solid #5a7a8a;
+        }
+        
+        .order-summary-item strong {
+            color: #202c39;
+        }
+        
+        .order-summary-row {
+            display: flex;
+            justify-content: space-between;
+            margin: 5px 0;
+            font-size: 0.95em;
+        }
+        
+        .order-summary-total {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 2px solid #e0e0e0;
+            font-size: 1.2em;
+            font-weight: 700;
+            text-align: right;
+            color: #5a7a8a;
+        }
+        
+        .order-overview {
+            background: #e8e8e0;
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #5a7a8a;
+            font-size: 0.95em;
+            line-height: 1.6;
+        }
+        
+        .order-overview-title {
+            font-weight: 700;
+            color: #202c39;
+            margin-bottom: 8px;
+        }
+        
+        .order-overview-items {
+            color: #202c39;
+        }
+        
+        .product-banner {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 30px;
+            padding: 15px;
+            background: white;
+            border-radius: 12px;
+            border: 2px solid #e0e0e0;
+        }
+        
+        .product-banner img {
+            width: 100%;
+            height: auto;
+            border-radius: 8px;
+            border: 2px solid #e0e0e0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🕊️ Bestellformular 🦆</h1>
+        <p class="subtitle">Hoodies, Kaputzenjacken & Socken</p>
+        
+        <!-- Product Banner -->
+        <div class="product-banner">
+            <img src="backShortLegs.jpg" alt="Short Legs Rückseite">
+            <img src="backLongLegs.jpg" alt="Long Legs Rückseite">
+            <img src="motivSocken.jpg" alt="Socken Motiv">
+        </div>
+        
+        <div id="successMessage" class="success-message hidden">
+                                        <h2>✅ Bestellung erfolgreich übermittelt!</h2>
+            <p>Vielen Dank für deine Bestellung! Wir haben alle Daten erhalten.</p>
+            
+            <div class="payment-info">
+                <h3>🕊️ Deine Bestellung</h3>
+                <div id="orderSummary" class="order-summary"></div>
+                
+                <div style="margin-top: 25px; padding-top: 20px; border-top: 2px solid #7a9b6d;">
+                    <h3 style="margin-bottom: 15px;">🦆 Zahlung</h3>
+                    <div class="payment-details">
+                        <p>Bitte überweise den folgenden Betrag per PayPal an:</p>
+                        <div class="paypal-address">berlinbirbs@gmail.com</div>
+                        <div class="payment-amount" id="finalAmount">0,00 €</div>
+                        <p style="margin-top: 15px;">
+                            🪶 <strong>Verwendungszweck:</strong> Bitte gib deinen Namen an, damit wir die Zahlung zuordnen können.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="reload-hint">
+                🦆 Du möchtest eine weitere Bestellung aufgeben?<br>
+                Lade die Seite neu (F5 oder Browser-Reload).
+            </div>
+        </div>
+        
+        <div id="errorMessage" class="error-message hidden">
+            ❌ Fehler beim Übermitteln der Bestellung. Bitte versuche es erneut.
+        </div>
+        
+        <form id="orderForm">
+            <!-- Persönliche Daten -->
+            <div class="form-group">
+                <label for="name">Name *</label>
+                <input type="text" id="name" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="email">E-Mail *</label>
+                <input type="email" id="email" required>
+            </div>
+            
+            <!-- Abholung -->
+            <div class="form-group">
+                <div class="checkbox-group">
+                    <input type="checkbox" id="abholung">
+                    <label for="abholung" style="margin-bottom: 0;">Abholung vor Ort</label>
+                </div>
+            </div>
+            
+            <!-- Adresse (nur bei Versand) -->
+            <div id="addressSection" class="form-group">
+                <div class="address-section">
+                    <label for="address">Versandadresse *</label>
+                    <textarea id="address" rows="4" placeholder="Straße, Hausnummer&#10;PLZ, Ort&#10;Land" required></textarea>
+                </div>
+            </div>
+            
+            <!-- Bestellpositionen -->
+            <div class="form-group">
+                <label>Artikel</label>
+                <div class="order-items" id="orderItems">
+                    <div class="order-item">
+                        <div class="order-item-header">
+                            <strong>Artikel 1</strong>
+                        </div>
+                        <div class="item-row">
+                            <select class="product-type" required>
+                                <option value="">Produkt wählen...</option>
+                                <option value="hoodie">Hoodie (55€)</option>
+                                <option value="kaputzenjacke">Kaputzenjacke (55€)</option>
+                                <option value="socken">Socken (10€)</option>
+                            </select>
+                            <select class="product-size" required>
+                                <option value="">Größe...</option>
+                                <option value="S">S</option>
+                                <option value="M">M</option>
+                                <option value="L">L</option>
+                                <option value="XL">XL</option>
+                                <option value="XXL">XXL</option>
+                            </select>
+                            <input type="number" class="product-quantity" min="1" value="1" required placeholder="Menge">
+                        </div>
+                        
+                        <!-- Size Chart -->
+                        <div class="size-chart hidden">
+                            <img class="size-chart-img" src="" alt="Größentabelle">
+                        </div>
+                        
+                        <!-- Motiv Auswahl pro Position -->
+                        <div class="motiv-section hidden">
+                            <div class="motiv-label">Motiv auswählen:</div>
+                            <div class="motiv-selection motiv-selection-clothing">
+                                <div class="motiv-option" data-motiv="shortlegs">
+                                    <div class="motiv-preview">
+                                        <img src="motivShortLegs.jpg" alt="Short Legs" onerror="this.parentElement.innerHTML='🎨'">
+                                    </div>
+                                    <strong>Short Legs</strong>
+                                </div>
+                                <div class="motiv-option" data-motiv="longlegs">
+                                    <div class="motiv-preview">
+                                        <img src="motivLongLegs.jpg" alt="Long Legs" onerror="this.parentElement.innerHTML='🚀'">
+                                    </div>
+                                    <strong>Long Legs</strong>
+                                </div>
+                            </div>
+                            <input type="hidden" class="selected-motiv">
+                        </div>
+                    </div>
+                </div>
+                <button type="button" class="btn btn-secondary" id="addItem">+ Weiteren Artikel hinzufügen</button>
+            </div>
+            
+            <!-- Übersicht -->
+            <div id="orderOverview" class="order-overview hidden">
+                <div class="order-overview-title">📋 Deine Artikel:</div>
+                <div class="order-overview-items" id="overviewText"></div>
+            </div>
+            
+            <!-- Gesamtpreis -->
+            <div class="total-price" id="totalPrice">
+                <div class="total-price-label">Gesamtpreis:</div>
+                <div class="total-price-amount">0,00 €</div>
+            </div>
+            
+            <button type="submit" class="btn" id="submitBtn">Bestellung abschicken</button>
+        </form>
+    </div>
+    
+    <script>
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz0VcRYRs5iRVVncT4H8GvBDhV4n-kHJsrNS069gds9kFsTxnnjr5GtpLWNNrS7tr19/exec';
+        let itemCounter = 1;
+        
+        // Preise
+        const PRICES = {
+            hoodie: 55,
+            kaputzenjacke: 55,
+            socken: 10
+        };
+        
+        // Größen für verschiedene Produkte
+        const SIZES = {
+            clothing: ['S', 'M', 'L', 'XL', 'XXL'],
+            socks: ['38-40', '41-43', '44-46']
+        };
+        
+        // Abholung Checkbox Toggle
+        document.getElementById('abholung').addEventListener('change', function() {
+            const addressSection = document.getElementById('addressSection');
+            const addressField = document.getElementById('address');
+            if (this.checked) {
+                addressSection.classList.add('hidden');
+                addressField.removeAttribute('required');
+                addressField.value = '';
+            } else {
+                addressSection.classList.remove('hidden');
+                addressField.setAttribute('required', 'required');
+            }
+        });
+        
+        // Größen-Dropdown und Motiv-Anzeige aktualisieren basierend auf Produkttyp
+        function updateProductOptions(selectElement) {
+            const productType = selectElement.value;
+            const orderItem = selectElement.closest('.order-item');
+            const sizeSelect = orderItem.querySelector('.product-size');
+            const motivSection = orderItem.querySelector('.motiv-section');
+            const motivInput = orderItem.querySelector('.selected-motiv');
+            const clothingMotivs = orderItem.querySelector('.motiv-selection-clothing');
+            const sizeChart = orderItem.querySelector('.size-chart');
+            const sizeChartImg = orderItem.querySelector('.size-chart-img');
+            const currentValue = sizeSelect.value;
+            
+            console.log('Product type:', productType);
+            console.log('Size chart element:', sizeChart);
+            console.log('Size chart img element:', sizeChartImg);
+            
+            // Größen-Optionen je nach Produkt
+            let sizes = [];
+            if (productType === 'socken') {
+                sizes = SIZES.socks;
+                motivSection.classList.add('hidden');
+                if (sizeChart) sizeChart.classList.add('hidden');
+                motivInput.removeAttribute('required');
+                motivInput.value = '';
+            } else if (productType === 'hoodie') {
+                sizes = SIZES.clothing;
+                motivSection.classList.remove('hidden');
+                clothingMotivs.classList.remove('hidden');
+                if (sizeChart) {
+                    sizeChart.classList.remove('hidden');
+                    if (sizeChartImg) {
+                        sizeChartImg.src = 'sizesHoodie.jpg';
+                        sizeChartImg.alt = 'Hoodie Größentabelle';
+                    }
+                }
+                motivInput.setAttribute('required', 'required');
+                motivInput.value = '';
+            } else if (productType === 'kaputzenjacke') {
+                sizes = SIZES.clothing;
+                motivSection.classList.remove('hidden');
+                clothingMotivs.classList.remove('hidden');
+                if (sizeChart) {
+                    sizeChart.classList.remove('hidden');
+                    if (sizeChartImg) {
+                        sizeChartImg.src = 'sizesZipper.jpg';
+                        sizeChartImg.alt = 'Kaputzenjacke Größentabelle';
+                    }
+                }
+                motivInput.setAttribute('required', 'required');
+                motivInput.value = '';
+            } else {
+                motivSection.classList.add('hidden');
+                if (sizeChart) sizeChart.classList.add('hidden');
+                motivInput.removeAttribute('required');
+                motivInput.value = '';
+            }
+            
+            // Remove all selected states when switching products
+            orderItem.querySelectorAll('.motiv-option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            
+            // Dropdown neu befüllen
+            if (sizes.length > 0) {
+                sizeSelect.innerHTML = '<option value="">Größe...</option>' + 
+                    sizes.map(size => `<option value="${size}">${size}</option>`).join('');
+                
+                // Versuche den alten Wert beizubehalten
+                if (sizes.includes(currentValue)) {
+                    sizeSelect.value = currentValue;
+                }
+            }
+            
+            // Preis aktualisieren
+            updateTotalPrice();
+        }
+        
+        // Gesamtpreis berechnen
+        function updateTotalPrice() {
+            let total = 0;
+            const overviewItems = [];
+            
+            document.querySelectorAll('.order-item').forEach(item => {
+                const productType = item.querySelector('.product-type').value;
+                const size = item.querySelector('.product-size').value;
+                const quantity = parseInt(item.querySelector('.product-quantity').value) || 0;
+                const motiv = item.querySelector('.selected-motiv').value;
+                
+                if (productType && PRICES[productType]) {
+                    const itemTotal = PRICES[productType] * quantity;
+                    total += itemTotal;
+                    
+                    // Text für Übersicht erstellen
+                    if (size && quantity > 0) {
+                        const productName = productType === 'hoodie' ? 'Hoodie' : 
+                                           productType === 'kaputzenjacke' ? 'Kaputzenjacke' : 'Socken';
+                        let itemText = `${quantity}x ${productName} (${size})`;
+                        if (motiv && motiv !== 'n/a' && (productType === 'hoodie' || productType === 'kaputzenjacke')) {
+                            const motivName = motiv === 'shortlegs' ? 'Short Legs' : 'Long Legs';
+                            itemText += ` - ${motivName}`;
+                        }
+                        itemText += ` = ${itemTotal}€`;
+                        overviewItems.push(itemText);
+                    }
+                }
+            });
+            
+            // Übersicht anzeigen/verstecken
+            const overviewDiv = document.getElementById('orderOverview');
+            const overviewText = document.getElementById('overviewText');
+            if (overviewItems.length > 0) {
+                overviewText.innerHTML = overviewItems.join('<br>');
+                overviewDiv.classList.remove('hidden');
+            } else {
+                overviewDiv.classList.add('hidden');
+            }
+            
+            // Gesamtpreis anzeigen
+            document.querySelector('.total-price-amount').textContent = 
+                total.toFixed(2).replace('.', ',') + ' €';
+        }
+        
+        // Event Listener für Produkttyp-Änderungen
+        document.getElementById('orderItems').addEventListener('change', function(e) {
+            if (e.target.classList.contains('product-type')) {
+                updateProductOptions(e.target);
+            }
+            // Bei allen Änderungen Preis aktualisieren
+            updateTotalPrice();
+        });
+        
+        // Bei Mengenänderung auch Preis aktualisieren
+        document.getElementById('orderItems').addEventListener('input', function(e) {
+            if (e.target.classList.contains('product-quantity')) {
+                updateTotalPrice();
+            }
+        });
+        
+        // Motiv Auswahl Handler (Event Delegation)
+        document.getElementById('orderItems').addEventListener('click', function(e) {
+            const motivOption = e.target.closest('.motiv-option');
+            if (motivOption) {
+                const orderItem = motivOption.closest('.order-item');
+                const motivSection = orderItem.querySelector('.motiv-section');
+                const motivInput = orderItem.querySelector('.selected-motiv');
+                
+                // Deselect all in this item
+                motivSection.querySelectorAll('.motiv-option').forEach(opt => {
+                    opt.classList.remove('selected');
+                });
+                
+                // Select clicked one
+                motivOption.classList.add('selected');
+                motivInput.value = motivOption.dataset.motiv;
+            }
+        });
+        
+        // Position hinzufügen
+        document.getElementById('addItem').addEventListener('click', function() {
+            itemCounter++;
+            const orderItems = document.getElementById('orderItems');
+            const newItem = document.createElement('div');
+            newItem.className = 'order-item';
+            newItem.innerHTML = `
+                <div class="order-item-header">
+                    <strong>Artikel ${itemCounter}</strong>
+                    <button type="button" class="btn btn-remove" onclick="this.parentElement.parentElement.remove(); updateTotalPrice();">Entfernen</button>
+                </div>
+                <div class="item-row">
+                    <select class="product-type" required>
+                        <option value="">Produkt wählen...</option>
+                        <option value="hoodie">Hoodie (55€)</option>
+                        <option value="kaputzenjacke">Kaputzenjacke (55€)</option>
+                        <option value="socken">Socken (10€)</option>
+                    </select>
+                    <select class="product-size" required>
+                        <option value="">Größe...</option>
+                        <option value="S">S</option>
+                        <option value="M">M</option>
+                        <option value="L">L</option>
+                        <option value="XL">XL</option>
+                        <option value="XXL">XXL</option>
+                    </select>
+                    <input type="number" class="product-quantity" min="1" value="1" required placeholder="Menge">
+                </div>
+                
+                <!-- Size Chart -->
+                <div class="size-chart hidden">
+                    <img class="size-chart-img" src="" alt="Größentabelle">
+                </div>
+                
+                <div class="motiv-section hidden">
+                    <div class="motiv-label">Motiv auswählen:</div>
+                    <div class="motiv-selection motiv-selection-clothing">
+                        <div class="motiv-option" data-motiv="shortlegs">
+                            <div class="motiv-preview">
+                                <img src="motivShortLegs.jpg" alt="Short Legs" onerror="this.parentElement.innerHTML='🎨'">
+                            </div>
+                            <strong>Short Legs</strong>
+                        </div>
+                        <div class="motiv-option" data-motiv="longlegs">
+                            <div class="motiv-preview">
+                                <img src="motivLongLegs.jpg" alt="Long Legs" onerror="this.parentElement.innerHTML='🚀'">
+                            </div>
+                            <strong>Long Legs</strong>
+                        </div>
+                    </div>
+                    <input type="hidden" class="selected-motiv">
+                </div>
+            `;
+            orderItems.appendChild(newItem);
+        });
+        
+        // Formular Submit
+        document.getElementById('orderForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const submitBtn = document.getElementById('submitBtn');
+            const successMsg = document.getElementById('successMessage');
+            const errorMsg = document.getElementById('errorMessage');
+            
+            // Validate: Check if clothing items have motiv selected
+            let hasError = false;
+            document.querySelectorAll('.order-item').forEach(item => {
+                const productType = item.querySelector('.product-type').value;
+                const motivInput = item.querySelector('.selected-motiv');
+                
+                if ((productType === 'hoodie' || productType === 'kaputzenjacke') && !motivInput.value) {
+                    hasError = true;
+                    item.querySelector('.motiv-section').style.borderColor = '#dc3545';
+                }
+            });
+            
+            if (hasError) {
+                errorMsg.textContent = '❌ Bitte wähle ein Motiv für alle Hoodies und Jacken aus!';
+                errorMsg.classList.remove('hidden');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+                return;
+            }
+            
+            // Nachrichten verstecken
+            successMsg.classList.add('hidden');
+            errorMsg.classList.add('hidden');
+            
+            // Button deaktivieren
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Wird gesendet...';
+            
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+            const abholung = document.getElementById('abholung').checked;
+            const address = abholung ? 'Abholung vor Ort' : document.getElementById('address').value;
+            
+            const items = [];
+            document.querySelectorAll('.order-item').forEach(item => {
+                const type = item.querySelector('.product-type').value;
+                const size = item.querySelector('.product-size').value;
+                const quantity = item.querySelector('.product-quantity').value;
+                const motiv = item.querySelector('.selected-motiv').value || 'n/a';
+                
+                if (type && size && quantity) {
+                    items.push({ 
+                        type, 
+                        size, 
+                        quantity: parseInt(quantity),
+                        motiv: motiv || 'n/a'
+                    });
+                }
+            });
+            
+            const orderData = {
+                name,
+                email,
+                abholung,
+                address,
+                items
+            };
+            
+            try {
+                const response = await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(orderData)
+                });
+                
+                // Gesamtpreis für Success-Message berechnen
+                let totalAmount = 0;
+                items.forEach(item => {
+                    totalAmount += PRICES[item.type] * item.quantity;
+                });
+                
+                // Bestellübersicht erstellen
+                let orderSummaryHTML = '';
+                items.forEach((item, index) => {
+                    const productName = item.type === 'hoodie' ? 'Hoodie' : 
+                                       item.type === 'kaputzenjacke' ? 'Kaputzenjacke' : 'Socken';
+                    const itemTotal = PRICES[item.type] * item.quantity;
+                    let motivText = '';
+                    if (item.motiv !== 'n/a' && (item.type === 'hoodie' || item.type === 'kaputzenjacke')) {
+                        const motivName = item.motiv === 'shortlegs' ? 'Short Legs' : 'Long Legs';
+                        motivText = `<div class="order-summary-row"><span>Motiv:</span><span>${motivName}</span></div>`;
+                    }
+                    
+                    orderSummaryHTML += `
+                        <div class="order-summary-item">
+                            <strong>${productName}</strong>
+                            <div class="order-summary-row"><span>Größe:</span><span>${item.size}</span></div>
+                            <div class="order-summary-row"><span>Menge:</span><span>${item.quantity}x</span></div>
+                            ${motivText}
+                            <div class="order-summary-row"><span>Preis:</span><span>${itemTotal}€</span></div>
+                        </div>
+                    `;
+                });
+                orderSummaryHTML += `<div class="order-summary-total">Gesamtbetrag: ${totalAmount.toFixed(2).replace('.', ',')} €</div>`;
+                
+                document.getElementById('orderSummary').innerHTML = orderSummaryHTML;
+                
+                // Formular komplett ausblenden
+                document.getElementById('orderForm').style.display = 'none';
+                
+                // Betrag in Success-Message eintragen
+                document.getElementById('finalAmount').textContent = 
+                    totalAmount.toFixed(2).replace('.', ',') + ' €';
+                
+                // Success Message anzeigen
+                successMsg.classList.remove('hidden');
+                
+                // Nach oben scrollen
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+                
+            } catch (error) {
+                console.error('Error:', error);
+                errorMsg.textContent = '❌ Fehler beim Übermitteln der Bestellung. Bitte versuche es erneut.';
+                errorMsg.classList.remove('hidden');
+                
+                // Button wieder aktivieren bei Fehler
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Bestellung abschicken';
+            }
+        });
+    </script>
+</body>
+</html>
