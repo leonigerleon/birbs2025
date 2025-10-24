@@ -760,7 +760,7 @@
             let totalQuantity = 0;
             const overviewItems = [];
             
-            document.querySelectorAll('.order-item').forEach(item => {
+            document.querySelectorAll('.order-item').forEach((item, index) => {
                 const productType = item.querySelector('.product-type').value;
                 const size = item.querySelector('.product-size').value;
                 const quantity = parseInt(item.querySelector('.product-quantity').value) || 0;
@@ -768,22 +768,64 @@
                 
                 totalQuantity += quantity;
                 
-                if (productType && PRICES[productType]) {
-                    const itemTotal = PRICES[productType] * quantity;
-                    total += itemTotal;
+                // Text für Übersicht erstellen - auch für unvollständige Artikel
+                if (productType || size || quantity > 0) {
+                    const produktName = productType === 'hoodie' ? 'Hoodie' : 
+                                       productType === 'kaputzenjacke' ? 'Kaputzenjacke' : 
+                                       productType === 'socken' ? 'Socken' : '???';
                     
-                    // Text für Übersicht erstellen
-                    if (size && quantity > 0) {
-                        const productName = productType === 'hoodie' ? 'Hoodie' : 
-                                           productType === 'kaputzenjacke' ? 'Kaputzenjacke' : 'Socken';
-                        let itemText = `${quantity}x ${productName} (${size})`;
-                        if (motiv && motiv !== 'n/a' && (productType === 'hoodie' || productType === 'kaputzenjacke')) {
+                    let itemText = `<strong>Artikel ${index + 1}:</strong> `;
+                    let isComplete = true;
+                    let warnings = [];
+                    
+                    // Produkt check
+                    if (!productType) {
+                        warnings.push('Produkt fehlt');
+                        isComplete = false;
+                    } else {
+                        itemText += produktName;
+                    }
+                    
+                    // Größe check
+                    if (!size) {
+                        warnings.push('Größe fehlt');
+                        isComplete = false;
+                    } else {
+                        itemText += ` (${size})`;
+                    }
+                    
+                    // Motiv check (nur für Hoodies/Jacken)
+                    if ((productType === 'hoodie' || productType === 'kaputzenjacke')) {
+                        if (!motiv || motiv === '') {
+                            warnings.push('Motiv fehlt');
+                            isComplete = false;
+                        } else {
                             const motivName = motiv === 'shortlegs' ? 'Short Legs' : 'Long Legs';
                             itemText += ` - ${motivName}`;
                         }
-                        itemText += ` = ${itemTotal}€`;
-                        overviewItems.push(itemText);
                     }
+                    
+                    // Menge
+                    if (quantity > 0) {
+                        itemText = `${quantity}x ` + itemText;
+                    } else {
+                        warnings.push('Menge fehlt');
+                        isComplete = false;
+                    }
+                    
+                    // Preis berechnen wenn vollständig
+                    if (productType && PRICES[productType] && quantity > 0 && isComplete) {
+                        const itemTotal = PRICES[productType] * quantity;
+                        total += itemTotal;
+                        itemText += ` = ${itemTotal}€`;
+                    }
+                    
+                    // Warnungen anzeigen
+                    if (warnings.length > 0) {
+                        itemText += ` <span style="color: #dc3545;">⚠️ ${warnings.join(', ')}</span>`;
+                    }
+                    
+                    overviewItems.push(itemText);
                 }
             });
             
@@ -791,7 +833,7 @@
             const isAbholung = document.getElementById('abholung').checked;
             if (!isAbholung && total > 0) {
                 total += VERSANDKOSTEN;
-                overviewItems.push(`Versand = ${VERSANDKOSTEN}€`);
+                overviewItems.push(`<strong>Versand</strong> = ${VERSANDKOSTEN}€`);
             }
             
             // Warnung bei über 10 Artikeln
@@ -807,10 +849,11 @@
             // Übersicht anzeigen/verstecken
             const overviewText = document.getElementById('overviewText');
             if (overviewItems.length > 0) {
-                let overviewHTML = overviewItems.join('<br>');
+                let overviewHTML = '';
                 if (totalQuantity > 10) {
-                    overviewHTML = `<span style="color: #dc3545; font-weight: 700;">⚠️ Maximal 10 Artikel erlaubt! (Aktuell: ${totalQuantity})</span><br><br>` + overviewHTML;
+                    overviewHTML = `<span style="color: #dc3545; font-weight: 700;">⚠️ Maximal 10 Artikel erlaubt! (Aktuell: ${totalQuantity})</span><br><br>`;
                 }
+                overviewHTML += overviewItems.join('<br>');
                 overviewText.innerHTML = overviewHTML;
                 orderOverviewDiv.classList.remove('hidden');
             } else {
@@ -861,6 +904,9 @@
                 // Select clicked one
                 motivOption.classList.add('selected');
                 motivInput.value = motivOption.dataset.motiv;
+                
+                // Preis aktualisieren nach Motiv-Auswahl
+                updateTotalPrice();
             }
         });
         
@@ -951,18 +997,32 @@
             
             // Validate: Check if clothing items have motiv selected
             let hasError = false;
-            document.querySelectorAll('.order-item').forEach(item => {
+            let errorMessages = [];
+            
+            document.querySelectorAll('.order-item').forEach((item, index) => {
                 const productType = item.querySelector('.product-type').value;
+                const size = item.querySelector('.product-size').value;
+                const quantity = parseInt(item.querySelector('.product-quantity').value) || 0;
                 const motivInput = item.querySelector('.selected-motiv');
                 
-                if ((productType === 'hoodie' || productType === 'kaputzenjacke') && !motivInput.value) {
+                // Wenn Größe und Menge ausgefüllt sind, muss auch Produkt gewählt sein
+                if ((size || quantity > 0) && !productType) {
                     hasError = true;
-                    item.querySelector('.motiv-section').style.borderColor = '#dc3545';
+                    errorMessages.push(`Artikel ${index + 1}: Bitte Produkt auswählen!`);
+                }
+                
+                // Wenn Hoodie oder Jacke gewählt, muss Motiv ausgewählt sein
+                if ((productType === 'hoodie' || productType === 'kaputzenjacke') && size && quantity > 0) {
+                    if (!motivInput.value) {
+                        hasError = true;
+                        errorMessages.push(`Artikel ${index + 1}: Bitte Motiv auswählen!`);
+                        item.querySelector('.motiv-section').style.borderColor = '#dc3545';
+                    }
                 }
             });
             
             if (hasError) {
-                errorMsg.textContent = '❌ Bitte wähle ein Motiv für alle Hoodies und Jacken aus!';
+                errorMsg.innerHTML = '❌ ' + errorMessages.join('<br>');
                 errorMsg.classList.remove('hidden');
                 window.scrollTo({ top: 0, behavior: 'smooth' });
                 return;
@@ -988,7 +1048,8 @@
                 const quantity = item.querySelector('.product-quantity').value;
                 const motiv = item.querySelector('.selected-motiv').value || 'n/a';
                 
-                if (type && size && quantity) {
+                // Nur hinzufügen wenn Produkt UND Größe UND Menge vorhanden
+                if (type && size && quantity && parseInt(quantity) > 0) {
                     items.push({ 
                         type, 
                         size, 
